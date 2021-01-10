@@ -29,6 +29,8 @@ import java.util.Map;
 
 public class addGroupActivity extends AppCompatActivity {
 
+    public static final String EXTRA_MESSAGE = "com.example.cloudreminder.MESSAGE";
+
     private TextView status;
     private EditText name;
 
@@ -108,6 +110,10 @@ public class addGroupActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Intent intent = new Intent(this,MainActivity.class);
+        String message = "Back to Main Activity";
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
 
     }
 }
