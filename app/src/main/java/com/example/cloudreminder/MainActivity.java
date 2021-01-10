@@ -55,6 +55,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public static final String EXTRA_MESSAGE = "com.example.cloudreminder.MESSAGE";
+
+    public void addGroup (View view) {
+        Intent intent = new Intent(this,addGroupActivity.class);
+        String message = "Add group to a list.";
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+
     private Response.Listener<JSONArray> jsonArrayListener = new Response.Listener<JSONArray>() {
         @Override
         public void onResponse(JSONArray response){
