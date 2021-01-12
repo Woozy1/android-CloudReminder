@@ -45,7 +45,7 @@ public class addEventActivity extends AppCompatActivity implements
     EditText txtDate, txtTime;
     Button btnDatePicker, btnTimePicker;
     private int mYear, mMonth, mDay, mHour, mMinute;
-
+    Calendar calendardate;
     private RequestQueue requestQueue;
     private String url = "https://cloudreminder-dev.azurewebsites.net/api/v1/Event";
 
@@ -74,6 +74,7 @@ public class addEventActivity extends AppCompatActivity implements
 
             // Get Current Date
             final Calendar c = Calendar.getInstance();
+            calendardate = c;
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
             mDay = c.get(Calendar.DAY_OF_MONTH);
@@ -120,11 +121,10 @@ public class addEventActivity extends AppCompatActivity implements
         try {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("name", name.getText());
-            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
             LocalDateTime myObj = LocalDateTime.now();
-            System.out.println(myObj.toString());
             jsonBody.put("dateCreated", myObj.format(myFormatObj).toString());
-            jsonBody.put("eventCreated", txtDate.getText() + "T" +txtTime.getText()+":00");
+            jsonBody.put("eventDate", txtDate.getText() + "T" +txtTime.getText()+":00");
             final String mRequestBody = jsonBody.toString();
             System.out.println(mRequestBody);
             status.setText(mRequestBody);
@@ -159,7 +159,7 @@ public class addEventActivity extends AppCompatActivity implements
                     String responseString = "";
                     if (response != null) {
                         responseString = String.valueOf(response.statusCode);
-                        status.setText(responseString);
+                        //status.setText(responseString);
                     }
                     return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
                 }
