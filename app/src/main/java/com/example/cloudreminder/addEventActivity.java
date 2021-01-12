@@ -2,13 +2,18 @@ package com.example.cloudreminder;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
-import android.widget.EditText;
-import android.widget.TextView;
-
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TimePicker;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -17,47 +22,111 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class addGroupActivity extends AppCompatActivity {
+public class addEventActivity extends AppCompatActivity implements
+        View.OnClickListener {
 
     public static final String EXTRA_MESSAGE = "com.example.cloudreminder.MESSAGE";
 
     private TextView status;
     private EditText name;
+    EditText txtDate, txtTime;
+    Button btnDatePicker, btnTimePicker;
+    private int mYear, mMonth, mDay, mHour, mMinute;
 
     private RequestQueue requestQueue;
-    private String url = "https://cloudreminder-dev.azurewebsites.net/api/v1/Group";
+    private String url = "https://cloudreminder-dev.azurewebsites.net/api/v1/Event";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_group);
+        setContentView(R.layout.activity_add_event);
 
         name = (EditText) findViewById(R.id.teName);
         status = (TextView) findViewById(R.id.status);
         requestQueue = Volley.newRequestQueue(getApplicationContext());
-        System.out.println("iwiwiwiwiwiwiwiwi");
+        btnDatePicker=(Button)findViewById(R.id.btn_date);
+        btnTimePicker=(Button)findViewById(R.id.btn_time);
+        txtDate=(EditText)findViewById(R.id.in_date);
+        txtTime=(EditText)findViewById(R.id.in_time);
+        btnDatePicker.setOnClickListener(this);
+        btnTimePicker.setOnClickListener(this);
 
     }
 
-    public void addGroup(View view){
+    @Override
+    public void onClick(View v) {
+
+        if (v == btnDatePicker) {
+
+            // Get Current Date
+            final Calendar c = Calendar.getInstance();
+            mYear = c.get(Calendar.YEAR);
+            mMonth = c.get(Calendar.MONTH);
+            mDay = c.get(Calendar.DAY_OF_MONTH);
+
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                    new DatePickerDialog.OnDateSetListener() {
+
+                        @Override
+                        public void onDateSet(DatePicker view, int year,
+                                              int monthOfYear, int dayOfMonth) {
+
+                            txtDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+
+                        }
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
+        }
+        if (v == btnTimePicker) {
+
+            // Get Current Time
+            final Calendar c = Calendar.getInstance();
+            mHour = c.get(Calendar.HOUR_OF_DAY);
+            mMinute = c.get(Calendar.MINUTE);
+
+            // Launch Time Picker Dialog
+            TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                    new TimePickerDialog.OnTimeSetListener() {
+
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay,
+                                              int minute) {
+
+                            txtTime.setText(hourOfDay + ":" + minute);
+                        }
+                    }, mHour, mMinute, true);
+            timePickerDialog.show();
+        }
+    }
+
+
+    public void addEvent(View view){
         this.status.setText("Posting to " + url);
         try {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("name", name.getText());
-
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime myObj = LocalDateTime.now();
+            System.out.println(myObj.toString());
+            jsonBody.put("dateCreated", myObj.format(myFormatObj).toString());
+            jsonBody.put("eventCreated", txtDate.getText() + "T" +txtTime.getText()+":00");
             final String mRequestBody = jsonBody.toString();
-
+            System.out.println(mRequestBody);
             status.setText(mRequestBody);
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {

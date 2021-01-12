@@ -13,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -45,6 +47,7 @@ public class GroupsFragment extends Fragment {
     private String url = "https://cloudreminder-dev.azurewebsites.net/api/v1/Group";
     Button btn;
     Button btn2;
+    private ListView listView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -97,7 +100,7 @@ public class GroupsFragment extends Fragment {
         requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
         btn = (Button) getView().findViewById(R.id.button);
         btn2 = (Button) getView().findViewById(R.id.addGroup);
-        groups = (TextView) getView().findViewById(R.id.groups);
+        listView = (ListView) getView().findViewById(R.id.groups);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,12 +154,8 @@ public class GroupsFragment extends Fragment {
                     return;
                 }
             }
-            groups.setText("");
-            for (String row: data){
-                String currentText = groups.getText().toString();
-                System.out.println(currentText);
-                groups.setText(currentText + "\n\n" + row);
-            }
+            ArrayAdapter arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, data);
+            listView.setAdapter(arrayAdapter);
         }
     };
 
